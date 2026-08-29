@@ -42,6 +42,15 @@ export async function sendToAdmin(html: string): Promise<TelegramResult> {
         console.error("[telegram] rejected", response.status, body.slice(0, 400));
         return { ok: false, reason: "api-error" };
       }
+
+      // 5xx is worth another attempt, but log it: without this a Telegram
+      // outage is indistinguishable from a dead network in the logs, which is
+      // exactly the moment someone is trying to work out why quotes stopped.
+      console.error(
+        "[telegram] upstream error",
+        response.status,
+        `attempt ${attempt + 1} of 2`,
+      );
     } catch (error) {
       if (attempt === 1) {
         console.error("[telegram] network failure", error);
