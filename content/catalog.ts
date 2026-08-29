@@ -23,7 +23,7 @@ const familyData: Family[] = [
       ar: "أسلاك التجليد بأشكالها للمطابع ومصانع الدفاتر والقرطاسية.",
       en: "Binding wire in every profile, for printers and notebook manufacturers.",
     },
-    image: "family-stationery",
+    image: "cat-binding-wire",
   },
   {
     id: "fencing",
@@ -32,7 +32,7 @@ const familyData: Family[] = [
       ar: "شبك وأسلاك لتسييج الحدائق والملاعب والمنشآت وحماية المحيط.",
       en: "Mesh and wire for gardens, sports grounds, facilities and perimeter protection.",
     },
-    image: "family-fencing",
+    image: "cat-fencing-mesh",
   },
   {
     id: "construction",
@@ -41,7 +41,7 @@ const familyData: Family[] = [
       ar: "أسلاك التربيط واللحام والأنابيب والشبك الممدد لمواقع البناء.",
       en: "Tying and welding wire, pipe and expanded metal for building sites.",
     },
-    image: "family-construction",
+    image: "cat-steel-bar",
   },
 ];
 

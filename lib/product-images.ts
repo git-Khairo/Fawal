@@ -8,15 +8,23 @@ const EXTENSIONS = ["webp", "avif", "jpg", "jpeg", "png"] as const;
 const cache = new Map<string, string | null>();
 
 /**
+ * Caching a "not found" is only safe once the file set is frozen. In
+ * development it is actively wrong: the server caches null for every name at
+ * startup, and a photograph dropped in afterwards never appears until the
+ * process is restarted.
+ */
+const CACHE_MISSES = process.env.NODE_ENV === "production";
+
+/**
  * Resolves a product image name to a public URL, or null when the client has not
  * supplied that photograph yet.
  *
- * Dropping `barbed-wire.webp` into public/products replaces the placeholder with
+ * Dropping `barbed-wire.png` into public/products replaces the placeholder with
  * the real photograph. No code change, no rebuild of any component.
  */
 export function resolveProductImage(name: string): string | null {
   const cached = cache.get(name);
-  if (cached !== undefined) return cached;
+  if (cached !== undefined && (cached !== null || CACHE_MISSES)) return cached;
 
   for (const ext of EXTENSIONS) {
     if (existsSync(path.join(DIR, `${name}.${ext}`))) {
@@ -25,6 +33,6 @@ export function resolveProductImage(name: string): string | null {
       return url;
     }
   }
-  cache.set(name, null);
+  if (CACHE_MISSES) cache.set(name, null);
   return null;
 }

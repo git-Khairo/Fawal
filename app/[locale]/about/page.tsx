@@ -4,6 +4,8 @@ import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionary";
 import { Reveal } from "@/components/material/reveal";
 import { MeshGround } from "@/components/material/mesh-ground";
+import Image from "next/image";
+import { resolveProductImage } from "@/lib/product-images";
 
 export async function generateMetadata({
   params,
@@ -37,6 +39,8 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
 
   const sectors = [t.about.sector1, t.about.sector2, t.about.sector3];
 
+  const factoryImage = resolveProductImage("factory");
+
   return (
     <>
       <section className="relative overflow-hidden border-b border-hairline">
@@ -53,16 +57,24 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         </div>
       </section>
 
-      {/* The manufacturing network. Asymmetric on purpose: a heading held to one
-          side against a single paragraph, which is a different shape from every
-          other block on the page. */}
-      <section className="relative overflow-hidden border-b border-hairline">
-        <MeshGround
-          scale={58}
-          opacity={0.04}
-          className="[mask-image:linear-gradient(to_bottom,black,transparent)]"
-        />
-        <div className="relative mx-auto grid max-w-[1400px] gap-8 px-5 py-20 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16 lg:px-8 lg:py-28">
+      {/* The plant, full bleed behind the statement. The only place on this page
+          where type sits over an image, which is what sets it apart from the
+          lists above and below it. */}
+      <section className="relative isolate overflow-hidden border-b border-hairline">
+        <div className="absolute inset-0 -z-10">
+          {factoryImage ? (
+            <Image src={factoryImage} alt="" fill sizes="100vw" className="object-cover" />
+          ) : (
+            <div className="plate h-full w-full">
+              <MeshGround scale={86} opacity={0.13} />
+            </div>
+          )}
+          {/* Scrim. Without it the statement fails contrast against the
+              photograph, and this page is read on phones in daylight. */}
+          <div className="absolute inset-0 bg-gradient-to-t from-void via-void/90 to-void/70" />
+        </div>
+
+        <div className="relative mx-auto grid max-w-[1400px] gap-8 px-5 py-24 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16 lg:px-8 lg:py-36">
           <Reveal>
             <h2 className="font-display text-2xl font-semibold tracking-tight text-ink lg:text-4xl">
               {t.about.networkTitle}
