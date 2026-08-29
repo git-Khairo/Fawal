@@ -1,0 +1,386 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   Fawal Trading design tokens
+
+   Neutrals are tinted toward galvanized zinc (hue 240). The single accent is
+   verdigris (hue 178), taken from the slate-teal in the existing logo wordmark
+   and from what steel actually does over fifty years.
+
+   Deliberately not used: safety-orange on charcoal, and copper on black.
+   ========================================================================== */
+
+@theme {
+  /* Surfaces, darkest to lightest.
+     Lightness values are measured, not guessed: OKLab L is not CIE L*, and the
+     first pass at 0.145 rendered as #070b0d, which is effectively black.
+     void #0f1115 · deck #16191e · raised #1e2229 · inset #0c0e12 */
+  --color-void: oklch(0.182 0.008 240);
+  --color-deck: oklch(0.212 0.009 240);
+  --color-raised: oklch(0.252 0.01 238);
+  --color-inset: oklch(0.168 0.008 240);
+
+  /* Rules and edges. */
+  --color-hairline: oklch(0.315 0.01 238);
+  --color-edge: oklch(0.42 0.012 236);
+
+  /* Text. Three tiers, contrast measured against --color-deck:
+     ink 16.3:1 (AAA) · ink-2 8.6:1 (AAA) · ink-3 4.8:1 (AA)
+     Tuned high on purpose: buyers read this on a phone in daylight. */
+  --color-ink: oklch(0.965 0.004 230);
+  --color-ink-2: oklch(0.76 0.008 232);
+  --color-ink-3: oklch(0.6 0.009 234);
+
+  /* The one accent. Chroma stays under 0.1 so it reads as aged metal. */
+  --color-patina: oklch(0.76 0.095 178);
+  --color-patina-deep: oklch(0.52 0.08 180);
+  --color-patina-wash: oklch(0.3 0.03 182);
+
+  /* Specular range for the material system. */
+  --color-spec-hi: oklch(0.88 0.006 225);
+  --color-spec-lo: oklch(0.3 0.008 240);
+
+  --font-display: var(--font-display-face), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-body-face), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, "SFMono-Regular", monospace;
+
+  /* Ease-out-quint. No bounce, no elastic, anywhere on this site. */
+  --ease-metal: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --radius-plate: 2px;
+  --radius-tile: 3px;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    /* One implied light source for the whole site: above, slightly to the front.
+       Raised surfaces catch it on their top edge and fall away at the bottom. */
+    --bevel: inset 0 1px 0 color-mix(in oklch, var(--color-spec-hi) 8%, transparent),
+      inset 0 -1px 0 color-mix(in oklch, var(--color-spec-lo) 55%, transparent);
+    --bevel-strong: inset 0 1px 0 color-mix(in oklch, var(--color-spec-hi) 14%, transparent),
+      inset 0 -1px 0 color-mix(in oklch, var(--color-spec-lo) 70%, transparent);
+  }
+
+  * {
+    border-color: var(--color-hairline);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    /* No global smooth scrolling. It fights trackpads and mouse wheels, and it
+       delays every anchor jump. The skip link lands instantly instead. */
+    scroll-padding-top: 88px;
+  }
+
+  body {
+    background-color: var(--color-void);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Latin digits in both locales, matching the phone number in the brochure. */
+  :lang(ar) {
+    font-variant-numeric: lining-nums;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    /* Changa runs tall in Arabic and its Latin descenders are long, so the
+       leading has to clear both scripts rather than one. */
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-patina);
+    outline-offset: 2px;
+    border-radius: 1px;
+  }
+
+  ::selection {
+    background: var(--color-patina-wash);
+    color: var(--color-ink);
+  }
+
+  ::placeholder {
+    /* 4.6:1 against --color-inset. Readable in daylight on a phone. */
+    color: var(--color-ink-3);
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   The metal material system
+
+   Four rules, applied deliberately. Never decoration for its own sake.
+   ========================================================================== */
+
+@layer components {
+  /* A raised metal plate: bevelled edge plus anisotropic brush grain.
+     The grain angle is physical, so it does NOT mirror under RTL. */
+  .plate {
+    position: relative;
+    /* The grain is a background layer over the fill rather than a pseudo
+       element: a pseudo at z-index -1 inside an isolated context paints behind
+       the element's own background and is never seen. */
+    background-color: var(--color-raised);
+    background-image: repeating-linear-gradient(
+      100deg,
+      color-mix(in oklch, var(--color-spec-hi) 3%, transparent) 0px,
+      transparent 1px,
+      transparent 2px,
+      color-mix(in oklch, var(--color-spec-lo) 5%, transparent) 3px
+    );
+    box-shadow: var(--bevel);
+  }
+
+  .plate-inset {
+    background-color: var(--color-inset);
+    box-shadow: inset 0 1px 2px color-mix(in oklch, var(--color-spec-lo) 60%, transparent),
+      inset 0 -1px 0 color-mix(in oklch, var(--color-spec-hi) 5%, transparent);
+  }
+
+  /* Specular sweep. A narrow highlight travels across the surface on hover or
+     keyboard focus. This is the site's one motion signature: it acknowledges the
+     pointer and it makes the surface read as metal rather than as a coloured box. */
+  .specular {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .specular::after {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 45%;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+      100deg,
+      transparent,
+      color-mix(in oklch, var(--color-spec-hi) 16%, transparent),
+      transparent
+    );
+    transform: translateX(-180%);
+    opacity: 0;
+    transition: transform 720ms var(--ease-metal), opacity 220ms var(--ease-metal);
+  }
+
+  /* Travel direction follows the reading direction so the sweep always moves
+     "forward" for the reader. */
+  [dir="rtl"] .specular::after {
+    transform: translateX(180%);
+  }
+
+  .specular:hover::after,
+  .specular:focus-visible::after,
+  .specular:focus-within::after {
+    transform: translateX(280%);
+    opacity: 1;
+  }
+
+  [dir="rtl"] .specular:hover::after,
+  [dir="rtl"] .specular:focus-visible::after,
+  [dir="rtl"] .specular:focus-within::after {
+    transform: translateX(-280%);
+  }
+
+  /* Fine film grain, fixed to the viewport and never on a scrolling container,
+     so it costs one composite layer instead of continuous repaints. */
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.028;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Numerals, gauges, quantities and reference codes. */
+  .num {
+    font-family: var(--font-mono);
+    font-feature-settings: "tnum" 1;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* ==========================================================================
+   Motion
+
+   Everything above MOTION_INTENSITY 3 collapses to static under reduced motion.
+   ========================================================================== */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Entry on scroll, driven by the scroll timeline rather than by JavaScript.
+   The element is visible by default and the animation only ever takes it away
+   and gives it back, so a blocked or slow bundle can never leave a section
+   permanently blank. Browsers without view() simply show the content.
+   Justification for the motion itself: on a long page it establishes reading
+   order, so the eye lands on a heading before the grid beneath it. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: rise linear both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 25%;
+    }
+
+    /* Two later ranges give a grid its stagger without a per-item delay, which
+       a scroll timeline cannot express. */
+    .reveal-1 {
+      animation-range: entry 9% cover 30%;
+    }
+
+    .reveal-2 {
+      animation-range: entry 13% cover 35%;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .specular::after {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Cinematic hero
+
+   The opening reveals type the way the sequence reveals metal: a wipe from the
+   reading origin with a specular band travelling behind it. No fade up, no
+   per-letter stagger, and nothing that would split an Arabic word into
+   characters and destroy its shaping.
+   ========================================================================== */
+
+@keyframes hero-wipe-ltr {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 -0.2em 0 0);
+  }
+}
+
+@keyframes hero-wipe-rtl {
+  from {
+    clip-path: inset(0 0 0 100%);
+  }
+  to {
+    clip-path: inset(0 0 0 -0.2em);
+  }
+}
+
+@keyframes hero-sheen {
+  from {
+    transform: translateX(-130%);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  to {
+    transform: translateX(230%);
+    opacity: 0;
+  }
+}
+
+@layer components {
+  /* No display of its own. Forcing inline-block here turned the two supporting
+     paragraphs into inline boxes and laid them on top of each other. */
+  .hero-reveal {
+    position: relative;
+  }
+
+  /* The clip is applied only once JavaScript has confirmed it will run the
+     sequence. Clipping by default would leave the company name permanently
+     invisible on any load where the bundle fails or is blocked. */
+  [data-hero-armed="true"] .hero-reveal {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  [dir="rtl"] [data-hero-armed="true"] .hero-reveal {
+    clip-path: inset(0 0 0 100%);
+  }
+
+  .hero-reveal[data-shown="true"] {
+    animation: hero-wipe-ltr 1150ms var(--ease-metal) forwards;
+  }
+
+  [dir="rtl"] .hero-reveal[data-shown="true"] {
+    animation-name: hero-wipe-rtl;
+  }
+
+  /* The light that runs across the letters as they arrive. */
+  .hero-reveal[data-shown="true"]::after {
+    content: "";
+    position: absolute;
+    inset-block: -0.1em;
+    inset-inline-start: 0;
+    width: 38%;
+    pointer-events: none;
+    background: linear-gradient(
+      100deg,
+      transparent,
+      color-mix(in oklch, var(--color-spec-hi) 55%, transparent),
+      transparent
+    );
+    mix-blend-mode: overlay;
+    animation: hero-sheen 1500ms var(--ease-metal) 150ms forwards;
+  }
+
+  /* Quiet start: on the homepage the navigation arrives after the sequence has
+     begun, so the first thing on screen is material rather than interface. */
+  .nav-quiet {
+    animation: rise 900ms var(--ease-metal) 900ms backwards;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-reveal,
+  [dir="rtl"] .hero-reveal {
+    clip-path: none;
+    animation: none;
+  }
+
+  .hero-reveal[data-shown="true"]::after {
+    display: none;
+  }
+
+  .nav-quiet {
+    animation: none;
+  }
+}

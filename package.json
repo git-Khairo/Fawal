@@ -1,0 +1,35 @@
+{
+  "name": "fawal-trading",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test:message": "tsx scripts/check-inquiry-message.mts",
+    "manifest": "tsx scripts/generate-image-manifest.mts"
+  },
+  "dependencies": {
+    "@phosphor-icons/react": "2.1.10",
+    "motion": "13.1.1",
+    "next": "16.3.2",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "server-only": "^0.0.1",
+    "zod": "4.4.3",
+    "zustand": "5.0.15"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "24.9.2",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.1",
+    "eslint": "9.39.1",
+    "eslint-config-next": "16.3.2",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3",
+    "tsx": "4.23.12"
+  }
+}
